@@ -14,6 +14,7 @@ class apiController extends Controller
     // o Entrada: usuario, contraseña
     // o Salida: Nombre, Almacén, Perfil
 
+    //http://127.0.0.1:8000/api/login
     // {  
     //     "usuario": "",
     //     "password": ""
@@ -47,6 +48,7 @@ class apiController extends Controller
     // o Entrada: Usuario_ID quien quiere Editar, Usuario_ID a editar, (datos a editar)
     // o Salida: Si se ejecuto o no la edicion
 
+    //http://127.0.0.1:8000/api/editarUsuario
     // {
     //     "usuario_id_quien_quiere_editar": "",
     //     "usuario_id_a_editar": "",
@@ -109,6 +111,7 @@ class apiController extends Controller
     // o Entrada: Usuario_ID quien quiere Editar, Almacen_ID a editar, (datos a editar)
     // o Salida: Si se ejecutó o no la edición
 
+    //http://127.0.0.1:8000/api/editarAlmacen
     // {
     //     "usuario_id_quien_quiere_editar": "",
     //     "almacen_id_a_editar": "",
@@ -147,32 +150,38 @@ class apiController extends Controller
     // almacén y tipo de perfil
     // o Salida: Si se ejecutó correctamente
 
+    //http://127.0.0.1:8000/api/agregarUsuario
     // {
-    //     "usuario_id_quien_quiere_agregar": "",
-    //     "Usuario": "",
-    //     "Password": "",
-    //     "Nombre": "",
-    //     "Almacen_ID": ,
-    //     "Activo": true
+    //     "usuario_id_quien_quiere_agregar": "1",
+    //     "Usuario": "qwe",
+    //     "Password": "qweqweqweqwe",
+    //     "Nombre": "asdasdasdasdasdasdas",
+    //     "Almacen_ID": 2 ,
+    //     "Perfil_ID": 2,
+    //     "Activo": 9
     //   }
 
     public function agregarUsuario(Request $request)
     {
         $rules = [
-            'Usuario' => 'required',
-            'Password' => 'required',
-            'Nombre' => 'required',
+            'Usuario' => 'required|max:25',
+            'Password' => 'required|max:15',
+            'Nombre' => 'required|max:50',
             'Almacen_ID' => 'required',
-            'Activo' => 'required',
+            'Activo' => 'required|bool',
             'Perfil_ID' => 'required',
         ];
 
         $messages = [
             'Usuario.required' => 'El campo Usuario es obligatorio.',
+            'Usuario.max' => 'El campo Usuario debe ser menor a 25 caracteres.',
             'Password.required' => 'El campo Password es obligatorio.',
+            'Password.max' => 'El campo Password debe ser menor a 15 caracteres.',
             'Nombre.required' => 'El campo Nombre es obligatorio.',
+            'Nombre.max' => 'El campo Nombre debe ser menor a 50 caracteres.',
             'Almacen_ID.required' => 'El campo Almacen_ID es obligatorio.',
             'Activo.required' => 'El campo Activo es obligatorio.',
+            'Activo.boolean' => 'El campo Activo debe ser true o false.',
             'Perfil_ID.required' => 'El campo Perfil_ID es obligatorio.',
         ];
         //hace  la validacion para que no falte ningun campo
@@ -195,7 +204,15 @@ class apiController extends Controller
     // o Entrada: Usuario_ID quien quiere Editar, Usuario_ID
     // o Salida: Salida: Si se ejecutó correctamente
 
-    public function eliminarUsuario(Request $request){
+    // http://127.0.0.1:8000/api/eliminarUsuario
+    // {
+    //     "usuario_id_quien_quiere_eliminar": "1",
+    //     "usuario_id_a_eliminar": "qwe"
+    //   }
+
+
+    public function eliminarUsuario(Request $request)
+    {
         $usuario = TblUsuario::where('Usuario_ID', $request->usuario_id_quien_quiere_eliminar)->first();
         //verificar si el usuario existe
         if (!$usuario) {
@@ -206,17 +223,15 @@ class apiController extends Controller
             return response()->json("usuario_id_quien_quiere_eliminar no tiene permiso para realizar esta accion");
         }
         $usuario_a_eliminar = TblUsuario::find($request->usuario_id_a_eliminar);
-        if(!$usuario_a_eliminar){
+        if (!$usuario_a_eliminar) {
             return response()->json("usuario_id_a_eliminar no existe");
         }
         //agregue esta validacion
-        if($usuario_a_eliminar->Perfil_ID == 1){
+        if ($usuario_a_eliminar->Perfil_ID == 1) {
             return response()->json("No se puede eliminar a un usuario administrador");
         }
         //eliminar usuario
         $usuario_a_eliminar->delete();
         return response()->json("Usuario eliminado");
     }
-
-
 }
